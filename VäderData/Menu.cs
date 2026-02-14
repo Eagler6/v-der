@@ -28,7 +28,9 @@ namespace VäderData
         public static string MenuSearchDate()
         {
             Console.Clear();
-            Console.WriteLine("Enter a date to check per dayrecord(yyyy-mm-dd): ");
+            Console.WriteLine("Enter a date to check per day record (yyyy-mm-dd):");
+            Console.WriteLine("---Dates 2016-06-01 to 2016-12-08 are available---");
+            Console.WriteLine("==================================================");
             string input = Console.ReadLine();
             var processor = new FileProcessor();
             List<WeatherData> WeatherList = processor.LoadWeatherFile(DataFile);
@@ -90,6 +92,7 @@ namespace VäderData
         {
             Console.Clear();
             Console.WriteLine("Statistik - välj ett alternativ:");
+            Console.WriteLine("================================");
             Console.WriteLine("1 - Statistik för temperatur");
             Console.WriteLine("2 - Statistik för mögelrisk");
             Console.WriteLine("3 - Tillbaka");
