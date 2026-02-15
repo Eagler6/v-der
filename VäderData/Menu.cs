@@ -110,8 +110,7 @@ namespace VäderData
                     break;
             }
         }
-
-        public static void MenuStatisticsTemperature()
+           public static void MenuStatisticsTemperature()
         {
             Console.Clear();
             var processor = new FileProcessor();
@@ -121,37 +120,39 @@ namespace VäderData
 
             var perDayTemps = StatisticsService.ComputePerDayTemps(WeatherList);
 
-            Console.WriteLine("Warmest per day (ute högst först):");
+            Console.WriteLine("Warmest per day ute (högst först):");
             foreach (var day in perDayTemps.OrderByDescending(x => x.AvgTempOutside))
             {
-                Console.WriteLine($"{day.Date:yyyy-MM-dd} - Ute: {day.AvgTempOutside:F2}°C, Inne: {day.AvgTempInside:F2}°C");
+                Console.WriteLine($"{day.Date:yyyy-MM-dd} - Ute: {day.AvgTempOutside:F2}°C");
             }
 
-            Console.WriteLine("\nWarmest per day (inne högst först):");
+            Console.WriteLine("\nWarmest per day inne (högst först):");
             foreach (var day in perDayTemps.OrderByDescending(x => x.AvgTempInside))
             {
-                Console.WriteLine($"{day.Date:yyyy-MM-dd} - Inne: {day.AvgTempInside:F2}°C, Ute: {day.AvgTempOutside:F2}°C");
+                Console.WriteLine($"{day.Date:yyyy-MM-dd} - Inne: {day.AvgTempInside:F2}°C");
             }
 
             var perMonthTemps = StatisticsService.ComputePerMonthAggregates(WeatherList);
 
-            Console.WriteLine("\nWarmest per month (ute högst först):");
+            Console.WriteLine("\nWarmest per month ute (högst först):");
             foreach (var m in perMonthTemps.OrderByDescending(x => x.AvgTempOutside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM} - Ute: {m.AvgTempOutside:F2}°C, Inne: {m.AvgTempInside:F2}°C");
+                Console.WriteLine($"{m.Date:yyyy-MM} - Ute: {m.AvgTempOutside:F2}°C");
             }
 
-            Console.WriteLine("\nWarmest per month (inne högst först):");
+            Console.WriteLine("\nWarmest per month inne (högst först):");
             foreach (var m in perMonthTemps.OrderByDescending(x => x.AvgTempInside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM} - Inne: {m.AvgTempInside:F2}°C, Ute: {m.AvgTempOutside:F2}°C");
+                Console.WriteLine($"{m.Date:yyyy-MM} - Inne: {m.AvgTempInside:F2}°C");
             }
 
             var seasonResults = StatisticsService.ComputeSeasonArrivals(WeatherList);
+           
             StatisticsService.AppendSeasonLinesToFile(seasonResults.autumn, seasonResults.winter);
 
             Console.ReadKey();
         }
+
 
         public static void MenuStatisticsMoldRisk()
         {
@@ -159,49 +160,52 @@ namespace VäderData
             var processor = new FileProcessor();
             List<WeatherData> WeatherList = processor.LoadWeatherFile(DataFile);
 
+            // Save monthly averages + mold risk to file (unchanged behavior)
             var perMonthAggregates = StatisticsService.ComputePerMonthAggregates(WeatherList);
-
             try
             {
-                StatisticsService.SaveMonthlyAveragesToFile(perMonthAggregates, StatisticsService.ComputeSeasonArrivals(WeatherList).autumn, StatisticsService.ComputeSeasonArrivals(WeatherList).winter);
+                var season = StatisticsService.ComputeSeasonArrivals(WeatherList);
+                StatisticsService.SaveMonthlyAveragesToFile(perMonthAggregates, season.autumn, season.winter);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to save monthly averages: {ex.Message}");
             }
 
+            // Per-day mold risk (print only the requested metric)
             var moldRiskByDay = StatisticsService.ComputeMoldRiskByDay(WeatherList);
 
-            Console.WriteLine("\nMögelrisk per dag (ute högst först):");
+            Console.WriteLine("\nMögelrisk per dag ute (högst först):");
             foreach (var m in moldRiskByDay.OrderByDescending(x => x.RiskOutside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM-dd} - Ute: {m.RiskOutside} (T: {m.AvgTempOutside:F2}°C, H: {m.AvgHumOutside:F2}%) - Inne: {m.RiskInside} (T: {m.AvgTempInside:F2}°C, H: {m.AvgHumInside:F2}%)");
+                Console.WriteLine($"{m.Date:yyyy-MM-dd} - Ute: {m.RiskOutside}");
             }
 
-            Console.WriteLine("\nMögelrisk per dag (inne högst först):");
+            Console.WriteLine("\nMögelrisk per dag inne (högst först):");
             foreach (var m in moldRiskByDay.OrderByDescending(x => x.RiskInside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM-dd} - Inne: {m.RiskInside} (T: {m.AvgTempInside:F2}°C, H: {m.AvgHumInside:F2}%) - Ute: {m.RiskOutside}");
+                Console.WriteLine($"{m.Date:yyyy-MM-dd} - Inne: {m.RiskInside}");
             }
 
+            // Per-month mold risk (print only the requested metric)
             var moldRiskByMonth = StatisticsService.ComputeMoldRiskByMonth(WeatherList);
 
-            Console.WriteLine("\nMögelrisk per månad (ute högst först):");
+            Console.WriteLine("\nMögelrisk per månad ute (högst först):");
             foreach (var m in moldRiskByMonth.OrderByDescending(x => x.RiskOutside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM} - Ute: {m.RiskOutside} (T: {m.AvgTempOutside:F2}°C, H: {m.AvgHumOutside:F2}%) - Inne: {m.RiskInside}");
+                Console.WriteLine($"{m.Date:yyyy-MM} - Ute: {m.RiskOutside}");
             }
 
-            Console.WriteLine("\nMögelrisk per månad (inne högst först):");
+            Console.WriteLine("\nMögelrisk per månad inne (högst först):");
             foreach (var m in moldRiskByMonth.OrderByDescending(x => x.RiskInside))
             {
-                Console.WriteLine($"{m.Date:yyyy-MM} - Inne: {m.RiskInside} (T: {m.AvgTempInside:F2}°C, H: {m.AvgHumInside:F2}%) - Ute: {m.RiskOutside}");
+                Console.WriteLine($"{m.Date:yyyy-MM} - Inne: {m.RiskInside}");
             }
 
             Console.ReadKey();
         }
 
-        // Keep the legacy MenuStatistics for compatibility (calls refactored functions)
+
         public static void MenuStatistics()
         {
             Console.Clear();
