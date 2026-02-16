@@ -90,27 +90,35 @@ namespace VäderData
 
         public static void MenuStatisticsMenu()
         {
-            Console.Clear();
-            Console.WriteLine("Statistik - välj ett alternativ:");
-            Console.WriteLine("================================");
-            Console.WriteLine("1 - Statistik för temperatur");
-            Console.WriteLine("2 - Statistik för mögelrisk");
-            Console.WriteLine("3 - Tillbaka");
-            string input = Console.ReadLine();
-
-            switch (input)
+            while (true)
             {
-                case "1":
-                    MenuStatisticsTemperature();
-                    break;
-                case "2":
-                    MenuStatisticsMoldRisk();
-                    break;
-                default:
-                    break;
+                Console.Clear();
+                Console.WriteLine("Statistik - välj ett alternativ:");
+                Console.WriteLine("================================");
+                Console.WriteLine("1 - Statistik för temperatur");
+                Console.WriteLine("2 - Statistik för möjlig mögelrisk");
+                Console.WriteLine("3 - Tillbaka");
+                string input = Console.ReadLine();
+
+                switch (input)
+                {
+                    case "1":
+                        MenuStatisticsTemperature();
+                        break;
+                    case "2":
+                        MenuStatisticsMoldRisk();
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Ogiltigt val. Tryck valfri tangent för att försöka igen...");
+                        Console.ReadKey();
+                        break;
+                }
             }
         }
-           public static void MenuStatisticsTemperature()
+
+        public static void MenuStatisticsTemperature()
         {
             Console.Clear();
             var processor = new FileProcessor();
@@ -147,12 +155,12 @@ namespace VäderData
             }
 
             var seasonResults = StatisticsService.ComputeSeasonArrivals(WeatherList);
-           
             StatisticsService.AppendSeasonLinesToFile(seasonResults.autumn, seasonResults.winter);
 
+            Console.WriteLine();
+            Console.WriteLine("Tryck valfri tangent för att återgå till statistikmenyn...");
             Console.ReadKey();
         }
-
 
         public static void MenuStatisticsMoldRisk()
         {
@@ -160,7 +168,7 @@ namespace VäderData
             var processor = new FileProcessor();
             List<WeatherData> WeatherList = processor.LoadWeatherFile(DataFile);
 
-            // Save monthly averages + mold risk to file (unchanged behavior)
+            // Save monthly averages + mold risk to file
             var perMonthAggregates = StatisticsService.ComputePerMonthAggregates(WeatherList);
             try
             {
@@ -172,7 +180,7 @@ namespace VäderData
                 Console.WriteLine($"Failed to save monthly averages: {ex.Message}");
             }
 
-            // Per-day mold risk (print only the requested metric)
+            // Per-day mold risk 
             var moldRiskByDay = StatisticsService.ComputeMoldRiskByDay(WeatherList);
 
             Console.WriteLine("\nMögelrisk per dag ute (högst först):");
@@ -187,7 +195,7 @@ namespace VäderData
                 Console.WriteLine($"{m.Date:yyyy-MM-dd} - Inne: {m.RiskInside}");
             }
 
-            // Per-month mold risk (print only the requested metric)
+            // Per-month mold risk 
             var moldRiskByMonth = StatisticsService.ComputeMoldRiskByMonth(WeatherList);
 
             Console.WriteLine("\nMögelrisk per månad ute (högst först):");
@@ -202,9 +210,10 @@ namespace VäderData
                 Console.WriteLine($"{m.Date:yyyy-MM} - Inne: {m.RiskInside}");
             }
 
+            Console.WriteLine();
+            Console.WriteLine("Tryck valfri tangent för att återgå till statistikmenyn...");
             Console.ReadKey();
         }
-
 
         public static void MenuStatistics()
         {
